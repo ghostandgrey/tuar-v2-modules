@@ -21,21 +21,26 @@ variable "db_remote_state_key" {
 
 variable "instance_type" {
   description = "The type of EC2 instance to run"
-  type = string
+  type        = string
 }
 
 variable "min_size" {
   description = "The minimum number of EC2 instances in the ASG"
-  type = number
+  type        = number
 }
 
 variable "max_size" {
   description = "The maximum number of EC2 instances in the ASG"
-  type = number
+  type        = number
 }
 
 variable "custom_tags" {
   description = "Custom tags to set on the Instances in the ASG"
-  type = map(string)
-  default = {}
+  type        = map(string)
+  default     = {}
+}
+
+variable "enable_autoscaling" {
+  description = "If set to true, enable autoscaling"
+  type        = bool
 }
