@@ -29,6 +29,8 @@ data "terraform_remote_state" "db" {
 }
 
 data "template_file" "user_data" {
+  count = var.enable_new_user_data ? 0 : 1
+
   template = file("${path.module}/user-data.sh")
 
   vars = {
@@ -38,11 +40,25 @@ data "template_file" "user_data" {
   }
 }
 
+data "template_file" "user_data_new" {
+  count = var.enable_new_user_data ? 1 : 0
+
+  template = file("${path.module}/user_data-new.sh")
+
+  vars = {
+    server_port = var.server_port
+  }
+}
+
 resource "aws_launch_configuration" "example" {
   image_id        = "ami-0c55b159cbfafe1f0"
   instance_type   = var.instance_type
   security_groups = [aws_security_group.instance.id]
-  user_data       = data.template_file.user_data.rendered
+  user_data = (
+    length(data.template_file.user_data[*]) > 0
+    ? data.template_file.user_data[0].rendered
+    : data.template_file.user_data_new[0].rendered
+  )
 
   lifecycle {
     create_before_destroy = true
